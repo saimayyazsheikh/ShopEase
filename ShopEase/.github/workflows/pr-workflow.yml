@@ -1,0 +1,45 @@
+name: Pull Request Workflow
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  pr-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Run Tests
+        run: |
+          cd user-service
+          pytest
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Run Tests for Product Service
+        run: |
+          cd product-service
+          npm test
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Build Order Service
+        run: |
+          cd order-service
+          ./mvnw clean install
