@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+  user-service:
+    image: user-service-image
+    build:
+      context: ./UserService
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5000:5000"
+    depends_on:
+      - user-db
+
+  product-service:
+    image: product-service-image
+    build:
+      context: ./ProductService
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - product-db
+
+  order-service:
+    image: order-service-image
+    build:
+      context: ./OrderService
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - order-db
+
+  user-db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+
+  product-db:
+    image: mongo
+    ports:
+      - "27017:27017"
+
+  order-db:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
